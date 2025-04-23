@@ -1,0 +1,41 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/base
+#
+
+# This is basically apt update apt upgrade
+- name: Update apt cache
+  apt:
+    update-cache: yes
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+#
+
+# This is apt install <something>
+- name: Install base utilities
+  apt:
+    name:
+      - curl
+      - vim
+      - git
+      - gzip
+      - unzip
+      - htop
+    state: present
+
+- name: Install fail2ban
+  apt:
+    name: fail2ban
+    state: present
+#
+
+# This ensures the fail2ban service is running (would be done with systemctl I think?)
+- name: Ensure fail2ban is running and enabled
+  service:
+    name: fail2ban
+    state: started
+    enabled: true
+#

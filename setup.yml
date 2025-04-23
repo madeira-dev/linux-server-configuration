@@ -1,0 +1,9 @@
+---
+- name: Configuration Management for Linux Server (roadmap.sh project)
+  hosts: docker_hosts
+  become: true
+  roles:
+    - { role: base, tags: ["base"] }
+    - { role: nginx , tags: ["nginx"] }
+    - { role: app, tags: ["app"] }
+    - { role: ssh, tags: ["ssh"] }
