@@ -19,7 +19,7 @@ Generating the key pair (in local machine/control machine:
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_ansible
 ```
 
-Now we copy the "id_ansible.pub" (public key) into the .ssh/authorized_keys.
+Now we copy the "id_ansible.pub" file (public key) to the VM under .ssh/ directory and write it to .ssh/authorized_keys in the VM.
 
 To make sure it is working, we can use this command:
 ```
