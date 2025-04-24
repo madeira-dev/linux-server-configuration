@@ -2,60 +2,39 @@
 
 This is an implementation of the project explained here: https://roadmap.sh/projects/configuration-management
 
-The project description recommends using a cloud provider but for the purpose of learning more things this implementation uses Docker to start my server locally.
+This project uses a Google Cloud Platform (GCP) Virtual Machine (VM) as the Linux Server.
 
-The Docker container for the linux server uses the jrei/systemd-ubuntu (systemd enabled) image.
-
-To start the Docker container we can use the following command:
-
+Add the GCP Linux Server VM to the inventory.ini file:
 ```
-docker run --name linux_server --privileged -dit -p 2222:22 ubuntu
+[gcp_hosts]
+e2micro-linux-server ansible_host=34.135.89.198 ansible_port=22 ansible_user=gabrielmadeira2002 ansible_ssh_private_key_file=~/.ssh/id_ansible ansible_connection=ssh ansible_become=true
 ```
 
-Details of the command:
-```
--dit -> starts container in detached mode;
+One important thing about the inventory.ini file is that each line should be one single host. Otherwise, we get an error
 
---name -> specify the name of the container
-
--p -> specify the port to be open
-```
-
-If the ubuntu image isn't already downloaded, the command above will automatically download it and start the container.
-
-Make sure to log in to the created container to install ssh since it comes uninstalled. Yes it could be done through Docker compose but for this project we are focusing on Ansible
-
-Add the Docker container to the inventory.ini file:
-```
-[docker_hosts]
-linux_server ansible_host=127.0.0.1 ansible_port=2222 ansible_user=root ansible_connection=ssh
-```
-One important thing about the inventory.ini file is that each line should be one single host. Otherwise, we will get an error
-
-Before running the setup.yml to start configuring the linux server, we need to make sure we can ssh into the server. We need to create an ssh keypair for ansible to access it.
+Before running the setup.yml, we need to make sure we can ssh into the server as Ansible. We need to create an ssh keypair for ansible to access it.
 
 Generating the key pair (in local machine/control machine:
 ```
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_ansible
-ssh-agent bash && ssh-add ~/.ssh/id_ansible
 ```
 
-The second command will start a bash session with ssh user, in this session:
+Now we copy the "id_ansible.pub" (public key) into the .ssh/authorized_keys.
+
+To make sure it is working, we can use this command:
 ```
-ssh-copy-id -i ~/.ssh/id_ansible.pub -p 2222 root@127.0.0.1
+ansible -i inventory.ini e2micro-linux-server -m ping
+```
+If we get a pong as response then it is working!
+
+Before running the ansible playbook we need to make sure the linux server user has sudo permissions to run commands such as 'apt update'.
+
+We have to log in the VM through GCP and add the following line to the end of the file 'visudo':
+```
+gabrielmadeira2002 ALL=(ALL) NOPASSWD: ALL
 ```
 
-In this bash session we will be required to enter the password for the root user (the default user) in the docker container so make sure to have already set one because it comes with no password by default and won't be able to authenticate through ssh. For this case we need to access the docker container.
-
-Still related to enabling ssh into the linux server container, be sure to have enabled the option to ssh as root with these commands:
-```
-sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/'       /etc/ssh/sshd_config
-service ssh restart
-```
-After this we can finally ssh into the server as root. Therefore, we can upload the ssh key for ansible to the container.
-
-After starting the Docker container as the linux server, run the Ansible setup.yml with the command:
+We can then finally run the playbook
 ```
 ansible-playbook -i inventory.ini setup.yml --tags nginx
 ```
