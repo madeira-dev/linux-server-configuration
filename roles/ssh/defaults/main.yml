@@ -1,3 +1,8 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # defaults file for roles/ssh
+
+ssh_public_key: "{{ lookup('file', '~/.ssh/id_ansible.pub') }}"
+ssh_authorized_user: "gabrielmadeira2002"
+ssh_user_home_dir: "/home/gabrielmadeira2002"
+

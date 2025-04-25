@@ -1,3 +1,31 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for roles/ssh
+
+- name: Ensure SSH server is installed
+  apt:
+    name: openssh-server
+    state: present
+
+- name: Ensure SSH service is running and enabled
+  service:
+    name: ssh
+    state: started
+    enabled: yes
+
+- name: Ensure .ssh directory exists
+  file:
+    path: "{{ ssh_user_home }}/.ssh"
+    state: directory
+    mode: '0700'
+    owner: "{{ ssh_user }}"
+    group: "{{ ssh_user }}"
+  vars:
+    ssh_user: "{{ ssh_authorized_user | default('root') }}"
+    ssh_user_home: "{{ ssh_user_home_dir | default('/root') }}"
+
+- name: Add public key to authorized_keys
+  authorized_key:
+    user: "{{ ssh_authorized_user | default('root') }}"
+    key: "{{ ssh_public_key }}"
+    state: present

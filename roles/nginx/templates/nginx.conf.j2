@@ -1,21 +1,24 @@
-user www-data;
-worker_processes auto;
-pid /run/nginx.pid;
+user www-data; # runs nginx as this user
+worker_processes auto; # automatically scales worker based on CPU cores
+pid /run/nginx.pid; # location of process ID file
 
 events {
-    worker_connections 768;
+    worker_connections 768; # maximum connection per worker process
 }
 
 http {
-    sendfile on;
-    tcp_nopush on;
-    tcp_nodelay on;
-    keepalive_timeout 65;
+    # Performance optimizations
+    sendfile on; # transfer files with zero-copy
+    tcp_nopush on; # optimizes packet transmission
+    tcp_nodelay on; # sends data immediately without buffering
+    keepalive_timeout 65; # how long connections remain open
     types_hash_max_size 2048;
 
+    # MIME type handling
     include /etc/nginx/mime.types;
     default_type application/octet-stream;
 
+    # Logging configuration
     access_log /var/log/nginx/access.log;
     error_log /var/log/nginx/error.log;
 
@@ -23,13 +26,13 @@ http {
         listen 80 default_server;
         listen [::]:80 default_server;
 
-        root /var/www/html;
-        index index.html;
+        root /var/www/html; # Document root - where files are served from
+        index index.html; # Defualt file to serve
 
-        server_name _;
+        server_name _; # accepts all domain names
 
         location / {
-            try_files $uri $uri/ =404;
+            try_files $uri $uri/ =404; # Try exact file, directory
         }
     }
 }

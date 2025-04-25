@@ -1,3 +1,33 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # tasks file for roles/app
+
+- name: Ensure destination directory exists
+  file:
+    path: /var/www/html
+    state: directory
+    mode: '0755'
+    owner: www-data
+    group: www-data
+
+- name: Upload website tarball
+  copy:
+    src: files/website.tar.gz
+    dest: /tmp/website.tar.gz
+    owner: www-data
+    group: www-data
+    mode: '0644'
+
+- name: Extract website tarball
+  unarchive:
+    src: /tmp/website.tar.gz
+    dest: /var/www/html
+    remote_src: yes
+    owner: www-data
+    group: www-data
+    mode: '0644'
+
+- name: Remove temporary tarball
+  file:
+    path: /tmp/website.tar.gz
+    state: absent

@@ -1,6 +1,6 @@
 ---
 - name: Configuration Management for Linux Server (roadmap.sh project)
-  hosts: docker_hosts
+  hosts: gcp_hosts
   become: true
   roles:
     - { role: base, tags: ["base"] }

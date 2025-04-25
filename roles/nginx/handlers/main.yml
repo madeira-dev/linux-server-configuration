@@ -2,6 +2,12 @@
 ---
 # handlers file for roles/nginx
 
+- name: Reload Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  tags: ["nginx"]
+
 - name: Restart Nginx
   ansible.builtin.service:
     name: nginx
