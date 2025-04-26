@@ -1,4 +1,4 @@
-Role Name
+App Role
 =========
 
 This role is repsonsible for uploading a tarball of a static HTML to the server and unzip it.
